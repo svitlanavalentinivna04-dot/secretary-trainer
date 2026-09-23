@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="uk" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер ПК — Секретар Керівника (Професія 4115)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        office: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#0f172a',
+                        },
+                        mint: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .key-cap {
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+        .key-cap.active-key {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+            background-color: #38bdf8 !important;
+            color: white !important;
+        }
+        .drag-over {
+            border-color: #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.1) !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans h-full flex flex-col transition-colors">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Title -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchModule('dashboard')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-office-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-office-500/20">
+                        <i class="fa-solid fa-user-tie text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg font-black tracking-tight bg-gradient-to-r from-office-700 to-office-500 dark:from-sky-400 dark:to-teal-300 bg-clip-text text-transparent">Секретар-PRO</span>
+                            <span class="text-[10px] bg-office-100 dark:bg-office-900/60 text-office-700 dark:text-sky-300 px-2 py-0.5 rounded-full font-bold">Код 4115</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium -mt-1">Виробниче навчання на ПК</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Modules Nav -->
+                <nav class="hidden lg:flex items-center gap-1 bg-slate-200/60 dark:bg-slate-800/60 p-1.5 rounded-2xl">
+                    <button onclick="switchModule('dashboard')" id="nav-dashboard" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-office-700 bg-white dark:bg-slate-700 shadow-sm">
+                        <i class="fa-solid fa-chart-line"></i> Дашборд
+                    </button>
+                    <button onclick="switchModule('email')" id="nav-email" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-envelope"></i> E-mail Листування
+                    </button>
+                    <button onclick="switchModule('shortcuts')" id="nav-shortcuts" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-keyboard"></i> Гарячі Клавіші
+                    </button>
+                    <button onclick="switchModule('files')" id="nav-files" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-folder-tree"></i> Номенклатура
+                    </button>
+                    <button onclick="switchModule('typing')" id="nav-typing" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-i-cursor"></i> Швидкодрук
+                    </button>
+                </nav>
+
+                <!-- User Stats Header Widget -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-3 py-1.5 rounded-xl">
+                        <i class="fa-solid fa-trophy text-amber-500"></i>
+                        <span class="text-xs font-black text-amber-700 dark:text-amber-300" id="total-score-display">0 БАЛІВ</span>
+                    </div>
+
+                    <button onclick="toggleTheme()" class="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Bar -->
+        <div class="lg:hidden border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 flex justify-around bg-white dark:bg-slate-900 text-[11px] font-semibold">
+            <button onclick="switchModule('dashboard')" class="flex flex-col items-center p-1 text-office-600"><i class="fa-solid fa-chart-line text-base"></i>Дашборд</button>
+            <button onclick="switchModule('email')" class="flex flex-col items-center p-1 text-slate-500"><i class="fa-solid fa-envelope text-base"></i>E-mail</button>
+            <button onclick="switchModule('shortcuts')" class="flex flex-col items-center p-1 text-slate-500"><i class="fa-solid fa-keyboard text-base"></i>Клавіші</button>
+            <button onclick="switchModule('files')" class="flex flex-col items-center p-1 text-slate-500"><i class="fa-solid fa-folder text-base"></i>Папки</button>
+            <button onclick="switchModule('typing')" class="flex flex-col items-center p-1 text-slate-500"><i class="fa-solid fa-i-cursor text-base"></i>Друк</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto">
+
+        <!-- ================= MODULE: DASHBOARD ================= -->
+        <section id="mod-dashboard" class="mod-content space-y-6">
+            <!-- Hero Card -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-office-800 via-office-700 to-teal-800 p-8 text-white shadow-xl">
+                <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="relative z-10 max-w-3xl space-y-3">
+                    <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-sm">Виробниче навчання ПК</span>
+                    <h1 class="text-3xl sm:text-4xl font-black">Вітаємо у симуляторі Секретаря Керівника!</h1>
+                    <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+                        Тренажер відпрацювання практичних цифрових навичок за стандартом професії 4115. Виконуйте завдання, підвищуйте кваліфікацію та станьте майстром діловодства!
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <button onclick="switchModule('email')" class="px-5 py-2.5 rounded-xl bg-mint-500 hover:bg-mint-600 text-white font-bold text-sm shadow-md transition-all">
+                            <i class="fa-solid fa-play mr-2"></i> Почати завдання E-mail
+                        </button>
+                        <button onclick="resetProgress()" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-slate-200 transition-all">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Скинути результат
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats & Mastery Level -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Rank Card -->
+                <div class="glass-card p-6 rounded-3xl space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase text-slate-400">Рівень кваліфікації</span>
+                        <i class="fa-solid fa-award text-2xl text-office-500"></i>
+                    </div>
+                    <div class="text-2xl font-black text-office-800 dark:text-sky-300" id="user-rank-title">Новачок</div>
+                    <div class="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div id="rank-progress-bar" class="h-full bg-gradient-to-r from-office-500 to-mint-500 w-0 transition-all duration-500"></div>
+                    </div>
+                    <p class="text-xs text-slate-500" id="rank-next-desc">Заробіть 100 балів для рівня "Помічник"</p>
+                </div>
+
+                <!-- Score Overview -->
+                <div class="glass-card p-6 rounded-3xl space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase text-slate-400">Загальний Прогрес</span>
+                        <i class="fa-solid fa-chart-pie text-2xl text-mint-500"></i>
+                    </div>
+                    <div class="text-3xl font-black" id="dash-total-score">0 / 400</div>
+                    <div class="text-xs text-slate-500">Загальний бал за всі 4 модулі підготовки</div>
+                </div>
+
+                <!-- Master Advice -->
+                <div class="glass-card p-6 rounded-3xl space-y-2 border-l-4 border-l-office-500">
+                    <div class="flex items-center gap-2 text-xs font-bold text-office-600 dark:text-sky-400">
+                        <i class="fa-solid fa-user-graduate"></i> Порада Майстра ВН:
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 italic leading-relaxed" id="master-advice-text">
+                        "Дотримуйтесь ділового етикету у листуванні та обов'язково перевіряйте назви файлів наказу перед збереженням у номенклатурну папку."
+                    </p>
+                </div>
+            </div>
+
+            <!-- Modules Grid Summary -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div onclick="switchModule('email')" class="glass-card p-5 rounded-2xl hover:border-office-500 cursor-pointer transition-all space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-envelope"></i></div>
+                    <h3 class="font-bold text-base">1. E-mail Листування</h3>
+                    <p class="text-xs text-slate-500">Оформлення листа керівникові з реквізитами та файлами.</p>
+                    <div class="text-xs font-bold text-office-600 dark:text-sky-400" id="stat-email-score">0 / 100 балів</div>
+                </div>
+
+                <div onclick="switchModule('shortcuts')" class="glass-card p-5 rounded-2xl hover:border-office-500 cursor-pointer transition-all space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/50 text-purple-600 flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-keyboard"></i></div>
+                    <h3 class="font-bold text-base">2. Гарячі Клавіші</h3>
+                    <p class="text-xs text-slate-500">Швидкі комбінації для Windows та MS Office.</p>
+                    <div class="text-xs font-bold text-office-600 dark:text-sky-400" id="stat-shortcuts-score">0 / 100 балів</div>
+                </div>
+
+                <div onclick="switchModule('files')" class="glass-card p-5 rounded-2xl hover:border-office-500 cursor-pointer transition-all space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-folder-tree"></i></div>
+                    <h3 class="font-bold text-base">3. Номенклатура</h3>
+                    <p class="text-xs text-slate-500">Сортування наказів, протоколів та листів за папками.</p>
+                    <div class="text-xs font-bold text-office-600 dark:text-sky-400" id="stat-files-score">0 / 100 балів</div>
+                </div>
+
+                <div onclick="switchModule('typing')" class="glass-card p-5 rounded-2xl hover:border-office-500 cursor-pointer transition-all space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-600 flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-i-cursor"></i></div>
+                    <h3 class="font-bold text-base">4. Швидкодрук</h3>
+                    <p class="text-xs text-slate-500">Точний та швидкий набір ділового документу.</p>
+                    <div class="text-xs font-bold text-office-600 dark:text-sky-400" id="stat-typing-score">0 / 100 балів</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MODULE 1: E-MAIL CLIENT SIMULATOR ================= -->
+        <section id="mod-email" class="mod-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-black">Симулятор E-mail Листування Секретаря</h2>
+                    <p class="text-xs text-slate-500">Завдання: Оформіть та надішліть офіційний електронний лист партнеру підприємства від імені керівника.</p>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">Макс. 100 БАЛІВ</span>
+            </div>
+
+            <!-- Task Requirement Card -->
+            <div class="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-xs space-y-1">
+                <span class="font-bold text-blue-800 dark:text-blue-300"><i class="fa-solid fa-circle-info mr-1"></i> Вимоги до листа:</span>
+                <ul class="list-disc pl-5 text-slate-600 dark:text-slate-300 space-y-0.5">
+                    <li>Отримувач: <strong>director@partner-corp.ua</strong></li>
+                    <li>Тема листа повинна чітко відображати суть (наприклад: <i>«Щодо укладення договору про співпрацю»</i>).</li>
+                    <li>Текст має містити шанобливе вітання (<i>Шановний... / Шановна...</i>), сутність звернення та офіційний підпис секретаря (ПІБ, посада, назва компанії).</li>
+                    <li>Прикріпіть потрібний файл проекту договору (.pdf або .docx).</li>
+                </ul>
+            </div>
+
+            <!-- Email Client UI -->
+            <div class="glass-card rounded-3xl overflow-hidden border shadow-lg">
+                <div class="bg-slate-200 dark:bg-slate-800 px-6 py-3 border-b border-slate-300 dark:border-slate-700 flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-300"><i class="fa-solid fa-paper-plane mr-2"></i> Нове повідомлення — Outlook Web Agent</span>
+                    <div class="flex gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-400 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-400 inline-block"></span>
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    <!-- Fields -->
+                    <div class="space-y-3 text-xs">
+                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-2">
+                            <label class="w-16 font-bold text-slate-500">Кому:</label>
+                            <input id="email-to" type="email" placeholder="director@partner-corp.ua" class="flex-1 bg-transparent focus:outline-none font-mono">
+                        </div>
+                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-2">
+                            <label class="w-16 font-bold text-slate-500">Тема:</label>
+                            <input id="email-subject" type="text" placeholder="Щодо проведення робочої зустрічі та узгодження проекту договору" class="flex-1 bg-transparent focus:outline-none font-semibold">
+                        </div>
+                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-2">
+                            <label class="w-16 font-bold text-slate-500">Файл:</label>
+                            <select id="email-attachment" class="flex-1 bg-transparent focus:outline-none font-medium">
+                                <option value="none">-- Оберіть файл для прикріплення --</option>
+                                <option value="contract_project.pdf">Проект_Договору_2026.pdf (Офіційний документ)</option>
+                                <option value="photo_cat.jpg">Фото_котика.jpg (Приватний файл)</option>
+                                <option value="random_notes.txt">Замітки.txt (Чернетка)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Email Body Textarea -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Текст офіційного листа:</label>
+                        <textarea id="email-body" rows="8" placeholder="Шановний Ігорю Петровичу!&#10;&#10;Надсилаємо Вам на узгодження проект договору про співпрацю...&#10;&#10;З повагою,&#10;Секретар керівника ТОВ «Авангард»&#10;Коваленко Олена Олександрівна" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-office-500 font-sans leading-relaxed"></textarea>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-between items-center pt-2">
+                        <button onclick="fillEmailTemplate()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            <i class="fa-solid fa-magic mr-1"></i> Вставити шаблон
+                        </button>
+
+                        <button onclick="checkEmailSubmission()" class="px-6 py-2.5 rounded-xl bg-office-600 hover:bg-office-700 text-white font-bold text-sm shadow-md transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Надіслати та перевірити
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Modal Result -->
+            <div id="email-feedback-box" class="hidden p-5 rounded-2xl border space-y-2"></div>
+        </section>
+
+        <!-- ================= MODULE 2: KEYBOARD SHORTCUTS CHALLENGE ================= -->
+        <section id="mod-shortcuts" class="mod-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-black">Симулятор Гарячих Клавіш (MS Office & Windows)</h2>
+                    <p class="text-xs text-slate-500">Швидкість роботи секретаря залежить від володіння клавіатурними скороченнями.</p>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-bold">Завдання <span id="shortcut-step-num">1</span> / 5</span>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl space-y-6 border shadow-lg text-center max-w-3xl mx-auto">
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest">Ситуація в офісі:</span>
+                    <h3 class="text-xl font-bold" id="shortcut-question-text">Як швидко скопіювати виділений текст наказу в буфер обміну?</h3>
+                </div>
+
+                <!-- Interactive On-Screen Keyboard Representation -->
+                <div class="p-4 rounded-2xl bg-slate-900 text-slate-200 shadow-inner space-y-2 inline-block">
+                    <div class="flex justify-center gap-1.5 text-xs font-mono">
+                        <div id="key-Ctrl" class="key-cap bg-slate-700 px-3 py-2 rounded-lg font-bold">Ctrl</div>
+                        <div id="key-Alt" class="key-cap bg-slate-700 px-3 py-2 rounded-lg font-bold">Alt</div>
+                        <div id="key-Win" class="key-cap bg-slate-700 px-3 py-2 rounded-lg font-bold"><i class="fa-brands fa-windows"></i></div>
+                        <div class="px-4 py-2 text-slate-500">+</div>
+                        <div id="key-C" class="key-cap bg-slate-800 px-3 py-2 rounded-lg border border-slate-600">C</div>
+                        <div id="key-V" class="key-cap bg-slate-800 px-3 py-2 rounded-lg border border-slate-600">V</div>
+                        <div id="key-Z" class="key-cap bg-slate-800 px-3 py-2 rounded-lg border border-slate-600">Z</div>
+                        <div id="key-S" class="key-cap bg-slate-800 px-3 py-2 rounded-lg border border-slate-600">S</div>
+                        <div id="key-P" class="key-cap bg-slate-800 px-3 py-2 rounded-lg border border-slate-600">P</div>
+                        <div id="key-F" class="key-cap bg-slate-800 px-3 py-2 rounded-lg border border-slate-600">F</div>
+                    </div>
+                </div>
+
+                <!-- Multiple Options Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2" id="shortcut-options-grid">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MODULE 3: FOLDER & FILE ORGANIZATION ================= -->
+        <section id="mod-files" class="mod-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-black">Номенклатура Справ та Упорядкування Файлів</h2>
+                    <p class="text-xs text-slate-500">Завдання: Перетягніть або класифікуйте вхідні документи у відповідні офіційні папки номенклатури.</p>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">Залишилося: <span id="files-left-count">4</span> док.</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Unsorted Documents Box -->
+                <div class="glass-card p-5 rounded-3xl border space-y-3">
+                    <h3 class="font-bold text-sm flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                        <i class="fa-solid fa-inbox text-amber-500"></i> Несортовані файли ("Робочий стіл"):
+                    </h3>
+                    <div id="unsorted-files-container" class="space-y-2 min-h-[200px]">
+                        <!-- Dynamic file items -->
+                    </div>
+                </div>
+
+                <!-- Target Nomenclature Folders Grid -->
+                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4" id="folders-target-grid">
+                    <!-- Folders injected dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MODULE 4: TYPING SPEED & ACCURACY TEST ================= -->
+        <section id="mod-typing" class="mod-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-black">Тренажер Швидкості та Точності Набору Ділового Тексту</h2>
+                    <p class="text-xs text-slate-500">Надрукуйте текст наказу керівника без помилок. Підраховується кількість слів за хвилину (WPM) та точність.</p>
+                </div>
+                <div class="flex gap-3 text-xs font-mono font-bold">
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-xl">WPM: <strong id="typing-wpm">0</strong></span>
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-xl">Точність: <strong id="typing-accuracy">100%</strong></span>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl border shadow-lg space-y-5">
+                <!-- Reference Text Box -->
+                <div class="p-5 rounded-2xl bg-slate-900 text-slate-200 font-mono text-sm leading-relaxed border border-slate-700 select-none" id="typing-reference-display">
+                    <!-- Character highlights will be rendered here -->
+                </div>
+
+                <!-- Typing Input Area -->
+                <div>
+                    <textarea id="typing-input" rows="4" oninput="handleTypingInput()" placeholder="Почніть друкувати текст вище сюди..." class="w-full p-4 rounded-2xl bg-white dark:bg-slate-950 border-2 border-slate-300 dark:border-slate-700 font-mono text-sm focus:outline-none focus:border-office-500"></textarea>
+                </div>
+
+                <div class="flex justify-between items-center text-xs text-slate-500">
+                    <span><i class="fa-solid fa-keyboard mr-1"></i> Відлік часу починається при першому натисканні клавіші.</span>
+                    <button onclick="resetTypingTest()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Почати спочатку
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        /* ==================== STATE MANAGEMENT ==================== */
+        const STORAGE_KEY = 'secretary_trainer_2026_data';
+
+        let appState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+            scores: {
+                email: 0,
+                shortcuts: 0,
+                files: 0,
+                typing: 0
+            },
+            theme: 'light'
+        };
+
+        function saveAppState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            updateDashboardUI();
+        }
+
+        /* ==================== AUDIO SYNTHESIZER ==================== */
+        function playTone(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'success') {
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else if (type === 'error') {
+                    osc.frequency.setValueAtTime(220, ctx.currentTime); // A3
+                    osc.frequency.setValueAtTime(174.61, ctx.currentTime + 0.15); // F3
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.35);
+                }
+            } catch (e) {
+                console.log("Audio autoplay restricted");
+            }
+        }
+
+        /* ==================== NAVIGATION & TABS ==================== */
+        function switchModule(modId) {
+            document.querySelectorAll('.mod-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`mod-${modId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2";
+            });
+
+            const activeNav = document.getElementById(`nav-${modId}`);
+            if (activeNav) {
+                activeNav.className = "nav-btn px-3.5 py-2 rounded-xl text-xs font-bold text-office-700 bg-white dark:bg-slate-700 shadow-sm transition-all flex items-center gap-2";
+            }
+
+            if (modId === 'dashboard') updateDashboardUI();
+            if (modId === 'shortcuts') loadShortcutQuestion();
+            if (modId === 'files') renderFilesModule();
+            if (modId === 'typing') initTypingTest();
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            appState.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            saveAppState();
+        }
+
+        /* ==================== DASHBOARD & RANKING LOGIC ==================== */
+        function updateDashboardUI() {
+            const total = appState.scores.email + appState.scores.shortcuts + appState.scores.files + appState.scores.typing;
+
+            document.getElementById('total-score-display').textContent = `${total} БАЛІВ`;
+            document.getElementById('dash-total-score').textContent = `${total} / 400`;
+
+            document.getElementById('stat-email-score').textContent = `${appState.scores.email} / 100 балів`;
+            document.getElementById('stat-shortcuts-score').textContent = `${appState.scores.shortcuts} / 100 балів`;
+            document.getElementById('stat-files-score').textContent = `${appState.scores.files} / 100 балів`;
+            document.getElementById('stat-typing-score').textContent = `${appState.scores.typing} / 100 балів`;
+
+            // Calculate Rank
+            let rank = "Новачок";
+            let nextDesc = "Заробіть 100 балів для рівня 'Помічник'";
+            let percent = (total / 400) * 100;
+
+            if (total >= 350) {
+                rank = "Майстер Діловодства 🏆";
+                nextDesc = "Максимальний рівень підготовки досягнуто!";
+            } else if (total >= 250) {
+                rank = "Професійний Секретар ⭐";
+                nextDesc = "Ще 100 балів до рівня 'Майстер Діловодства'";
+            } else if (total >= 100) {
+                rank = "Помічник Керівника 💼";
+                nextDesc = "Ще 150 балів до рівня 'Професійний Секретар'";
+            }
+
+            document.getElementById('user-rank-title').textContent = rank;
+            document.getElementById('rank-next-desc').textContent = nextDesc;
+            document.getElementById('rank-progress-bar').style.width = `${percent}%`;
+        }
+
+        function resetProgress() {
+            if (confirm("Ви дійсно бажаєте скинути всі накопичені бали тренажера?")) {
+                appState.scores = { email: 0, shortcuts: 0, files: 0, typing: 0 };
+                saveAppState();
+                showToast("Результати успішно скинуто.");
+            }
+        }
+
+        /* ==================== MODULE 1: E-MAIL CLIENT ==================== */
+        function fillEmailTemplate() {
+            document.getElementById('email-to').value = "director@partner-corp.ua";
+            document.getElementById('email-subject').value = "Щодо узгодження проекту договору про співпрацю";
+            document.getElementById('email-attachment').value = "contract_project.pdf";
+            document.getElementById('email-body').value = "Шановний Ігорю Петровичу!\n\nНадсилаємо Вам на узгодження проект договору про співпрацю між нашими підприємствами.\nПросимо розглянути документ та надати Ваші зауваження або підтвердження.\n\nЗ повагою,\nСекретар керівника ТОВ «Авангард»\nКоваленко Олена Олександрівна";
+        }
+
+        function checkEmailSubmission() {
+            const to = document.getElementById('email-to').value.trim();
+            const subject = document.getElementById('email-subject').value.trim();
+            const attachment = document.getElementById('email-attachment').value;
+            const body = document.getElementById('email-body').value.trim();
+
+            let score = 0;
+            let feedback = [];
+
+            // 1. Recipient Check (20 pts)
+            if (to.toLowerCase() === "director@partner-corp.ua") {
+                score += 20;
+            } else {
+                feedback.push("❌ Невірний email отримувача (має бути director@partner-corp.ua).");
+            }
+
+            // 2. Subject Line Check (20 pts)
+            if (subject.length > 10 && (subject.toLowerCase().includes("договор") || subject.toLowerCase().includes("співпрац"))) {
+                score += 20;
+            } else {
+                feedback.push("❌ Тема листа повинна бути конкретною та містити суть (наприклад: 'Щодо узгодження договору').");
+            }
+
+            // 3. Attachment Check (20 pts)
+            if (attachment === "contract_project.pdf") {
+                score += 20;
+            } else {
+                feedback.push("❌ Неприкріплено або обрано неправильний файл проекту договору (.pdf).");
+            }
+
+            // 4. Salutation & Courtesy Check (20 pts)
+            if (body.includes("Шановн")) {
+                score += 20;
+            } else {
+                feedback.push("❌ У тексті листа відсутнє офіційне шанобливе звернення ('Шановний...').");
+            }
+
+            // 5. Signature Check (20 pts)
+            if (body.includes("З повагою") && (body.includes("Секретар") || body.includes("секретар"))) {
+                score += 20;
+            } else {
+                feedback.push("❌ Відсутній офіційний підпис секретаря з фразою 'З повагою' та зазначенням посади.");
+            }
+
+            const feedbackBox = document.getElementById('email-feedback-box');
+            feedbackBox.classList.remove('hidden');
+
+            if (score === 100) {
+                feedbackBox.className = "p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 space-y-1 text-xs";
+                feedbackBox.innerHTML = `<div class="font-bold text-sm"><i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i> Відмінно! Лист оформлено ідеально за вимогами діловодства (+100 балів).</div>`;
+                playTone('success');
+            } else {
+                feedbackBox.className = "p-5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200 space-y-1 text-xs";
+                feedbackBox.innerHTML = `<div class="font-bold text-sm"><i class="fa-solid fa-triangle-exclamation text-rose-500 mr-2"></i> Оцінка листа: ${score} / 100 балів. Зауваження:</div><ul class="list-disc pl-5 font-medium">${feedback.map(f => `<li>${f}</li>`).join('')}</ul>`;
+                playTone('error');
+            }
+
+            appState.scores.email = score;
+            saveAppState();
+        }
+
+        /* ==================== MODULE 2: SHORTCUTS CHALLENGE ==================== */
+        const SHORTCUT_QUESTIONS = [
+            {
+                q: "Як швидко скопіювати виділений текст наказу в буфер обміну?",
+                keys: ["Ctrl", "C"],
+                options: [
+                    { label: "Ctrl + C", correct: true },
+                    { label: "Ctrl + V", correct: false },
+                    { label: "Ctrl + X", correct: false },
+                    { label: "Alt + C", correct: false }
+                ]
+            },
+            {
+                q: "Яка комбінація вставляє скопійований текст з буфера у документ MS Word?",
+                keys: ["Ctrl", "V"],
+                options: [
+                    { label: "Ctrl + P", correct: false },
+                    { label: "Ctrl + V", correct: true },
+                    { label: "Ctrl + Z", correct: false },
+                    { label: "Win + V", correct: false }
+                ]
+            },
+            {
+                q: "Термінове збереження відредагованого файлу службової записки:",
+                keys: ["Ctrl", "S"],
+                options: [
+                    { label: "Ctrl + S", correct: true },
+                    { label: "Ctrl + A", correct: false },
+                    { label: "Alt + F4", correct: false },
+                    { label: "Ctrl + F", correct: false }
+                ]
+            },
+            {
+                q: "Скасувати останню помилкову дію в тексті (Undo):",
+                keys: ["Ctrl", "Z"],
+                options: [
+                    { label: "Ctrl + Y", correct: false },
+                    { label: "Ctrl + Z", correct: true },
+                    { label: "Shift + Del", correct: false },
+                    { label: "Ctrl + W", correct: false }
+                ]
+            },
+            {
+                q: "Миттєво згорнути всі вікна та відкрити Робочий Стіл Windows:",
+                keys: ["Win", "D"],
+                options: [
+                    { label: "Alt + Tab", correct: false },
+                    { label: "Win + D", correct: true },
+                    { label: "Ctrl + Esc", correct: false },
+                    { label: "Win + L", correct: false }
+                ]
+            }
+        ];
+
+        let currentShortcutIdx = 0;
+        let shortcutScoreCount = 0;
+
+        function loadShortcutQuestion() {
+            const qData = SHORTCUT_QUESTIONS[currentShortcutIdx];
+            document.getElementById('shortcut-step-num').textContent = currentShortcutIdx + 1;
+            document.getElementById('shortcut-question-text').textContent = qData.q;
+
+            // Highlight keyboard keys visual
+            document.querySelectorAll('.key-cap').forEach(el => el.classList.remove('active-key'));
+
+            const grid = document.getElementById('shortcut-options-grid');
+            grid.innerHTML = qData.options.map((opt, idx) => `
+                <button onclick="answerShortcut(${idx})" class="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono font-bold text-sm hover:border-purple-500 transition-all">
+                    ${opt.label}
+                </button>
+            `).join('');
+        }
+
+        function answerShortcut(selectedIdx) {
+            const qData = SHORTCUT_QUESTIONS[currentShortcutIdx];
+            const isCorrect = qData.options[selectedIdx].correct;
+
+            if (isCorrect) {
+                shortcutScoreCount += 20;
+                playTone('success');
+                showToast("Вірно!", "success");
+            } else {
+                playTone('error');
+                showToast("Невірно!", "error");
+            }
+
+            currentShortcutIdx++;
+            if (currentShortcutIdx < SHORTCUT_QUESTIONS.length) {
+                loadShortcutQuestion();
+            } else {
+                // Finish module
+                appState.scores.shortcuts = shortcutScoreCount;
+                saveAppState();
+                showToast(`Модуль завершено! Ваш результат: ${shortcutScoreCount} / 100 балів.`);
+                currentShortcutIdx = 0;
+                shortcutScoreCount = 0;
+                loadShortcutQuestion();
+            }
+        }
+
+        /* ==================== MODULE 3: FILES & NOMENCLATURE ==================== */
+        const NOMENCLATURE_FOLDERS = [
+            { id: 'f_orders', name: "01-02 Накази керівника з основної діяльності", allowedTypes: ['order'] },
+            { id: 'f_protocols', name: "01-05 Протоколи засідань та нарад", allowedTypes: ['protocol'] },
+            { id: 'f_letters', name: "02-10 Вхідна та вихідна кореспонденція (Листи)", allowedTypes: ['letter'] },
+            { id: 'f_reports', name: "03-01 Звіти про виробничу діяльність", allowedTypes: ['report'] }
+        ];
+
+        let filesData = [
+            { id: 1, name: "Наказ_№45_Про_проведення_інвентаризації.docx", type: 'order' },
+            { id: 2, name: "Протокол_засідання_директорату_№12.pdf", type: 'protocol' },
+            { id: 3, name: "Лист_партнерам_щодо_постачання_обладнання.docx", type: 'letter' },
+            { id: 4, name: "Річний_звіт_виробничого_відділу_2025.xlsx", type: 'report' }
+        ];
+
+        let placedFiles = {};
+
+        function renderFilesModule() {
+            const unsortedContainer = document.getElementById('unsorted-files-container');
+            const leftCountEl = document.getElementById('files-left-count');
+
+            const remaining = filesData.filter(f => !placedFiles[f.id]);
+            leftCountEl.textContent = remaining.length;
+
+            unsortedContainer.innerHTML = remaining.map(f => `
+                <div draggable="true" ondragstart="handleDragStart(event, ${f.id})" class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between cursor-grab active:cursor-grabbing">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i class="fa-solid fa-file-lines text-office-500 text-base"></i>
+                        <span class="text-xs font-semibold truncate">${f.name}</span>
+                    </div>
+                    <i class="fa-solid fa-grip-vertical text-slate-400 text-xs"></i>
+                </div>
+            `).join('');
+
+            if (remaining.length === 0) {
+                unsortedContainer.innerHTML = `<div class="text-center text-xs text-emerald-600 font-bold py-8"><i class="fa-solid fa-circle-check text-2xl block mb-1"></i>Усі документи успішно впорядковано!</div>`;
+                appState.scores.files = 100;
+                saveAppState();
+            }
+
+            // Target Folders
+            const foldersGrid = document.getElementById('folders-target-grid');
+            foldersGrid.innerHTML = NOMENCLATURE_FOLDERS.map(folder => `
+                <div ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, '${folder.id}')" class="glass-card p-5 rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 space-y-3 transition-all min-h-[160px]">
+                    <div class="flex items-center gap-2 font-bold text-xs text-slate-700 dark:text-slate-200">
+                        <i class="fa-solid fa-folder text-amber-500 text-lg"></i>
+                        <span>${folder.name}</span>
+                    </div>
+                    <div class="space-y-1">
+                        ${Object.keys(placedFiles).filter(fid => placedFiles[fid] === folder.id).map(fid => {
+                            const fileObj = filesData.find(f => f.id == fid);
+                            return `<div class="text-[11px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 p-2 rounded-lg font-mono font-medium truncate"><i class="fa-solid fa-check mr-1"></i> ${fileObj.name}</div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleDragStart(ev, fileId) {
+            ev.dataTransfer.setData("text/plain", fileId);
+        }
+
+        function handleDragOver(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(ev) {
+            ev.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(ev, folderId) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            const fileId = ev.dataTransfer.getData("text/plain");
+            const fileObj = filesData.find(f => f.id == fileId);
+            const folderObj = NOMENCLATURE_FOLDERS.find(f => f.id === folderId);
+
+            if (folderObj.allowedTypes.includes(fileObj.type)) {
+                placedFiles[fileId] = folderId;
+                playTone('success');
+                showToast("Документ поміщено у правильну папку!", "success");
+            } else {
+                playTone('error');
+                showToast("Помилка! Цей документ не належить до цієї справи номенклатури.", "error");
+            }
+
+            renderFilesModule();
+        }
+
+        /* ==================== MODULE 4: TYPING SPEED & ACCURACY ==================== */
+        const TYPING_SAMPLE_TEXT = "НАКАЗ. Про забезпечення цифрового документообігу. З метою підвищення ефективності роботи секретаріату наказую впровадити електронний підпис.";
+
+        let typingStartTime = null;
+
+        function initTypingTest() {
+            const display = document.getElementById('typing-reference-display');
+            display.innerHTML = TYPING_SAMPLE_TEXT.split('').map((char, i) => `<span id="char-${i}">${char}</span>`).join('');
+            document.getElementById('typing-input').value = "";
+            typingStartTime = null;
+            document.getElementById('typing-wpm').textContent = "0";
+            document.getElementById('typing-accuracy').textContent = "100%";
+        }
+
+        function handleTypingInput() {
+            const inputVal = document.getElementById('typing-input').value;
+
+            if (!typingStartTime && inputVal.length > 0) {
+                typingStartTime = new Date();
+            }
+
+            let errors = 0;
+            const sampleChars = TYPING_SAMPLE_TEXT.split('');
+
+            sampleChars.forEach((char, idx) => {
+                const charSpan = document.getElementById(`char-${idx}`);
+                if (!charSpan) return;
+
+                if (idx < inputVal.length) {
+                    if (inputVal[idx] === char) {
+                        charSpan.className = "text-emerald-400 font-bold underline";
+                    } else {
+                        charSpan.className = "text-rose-400 bg-rose-950 font-bold";
+                        errors++;
+                    }
+                } else {
+                    charSpan.className = "";
+                }
+            });
+
+            // Calculate WPM and Accuracy
+            if (typingStartTime && inputVal.length > 0) {
+                const elapsedMinutes = (new Date() - typingStartTime) / 60000;
+                const wordsTyped = inputVal.trim().split(/\s+/).length;
+                const wpm = elapsedMinutes > 0 ? Math.round(wordsTyped / elapsedMinutes) : 0;
+                const accuracy = Math.max(0, Math.round(((inputVal.length - errors) / inputVal.length) * 100));
+
+                document.getElementById('typing-wpm').textContent = wpm;
+                document.getElementById('typing-accuracy').textContent = `${accuracy}%`;
+
+                if (inputVal.length >= TYPING_SAMPLE_TEXT.length) {
+                    const finalScore = Math.min(100, Math.round((accuracy * 0.7) + Math.min(30, wpm)));
+                    appState.scores.typing = finalScore;
+                    saveAppState();
+                    playTone('success');
+                    showToast(`Друк завершено! Зароблено балів: ${finalScore} / 100`);
+                }
+            }
+        }
+
+        function resetTypingTest() {
+            initTypingTest();
+        }
+
+        /* ==================== TOAST NOTIFIER ==================== */
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-xl shadow-xl text-white font-bold text-xs flex items-center gap-2 pointer-events-auto transition-all duration-300 ${type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-office-600'}`;
+            toast.innerHTML = `<i class="fa-solid fa-bell"></i> ${msg}`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        /* ==================== INITIALIZATION ==================== */
+        window.onload = function() {
+            if (appState.theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+            updateDashboardUI();
+        };
+    </script>
+</body>
+</html>
