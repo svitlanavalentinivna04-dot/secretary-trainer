@@ -3,588 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Інтерактивний тренажер: Обробка табличної інформації в MS Excel</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Тренажер: Мовні норми у професійній діяльності секретаря</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #2ecc71;
+            --warning-color: #e74c3c;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .meta-info {
+            font-size: 14px;
+            color: #666;
+            background: #eef2f5;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-left: 5px solid var(--secondary-color);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .task-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .task-meta {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+
+        .item label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: block;
+            margin: 30px auto 0;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .feedback {
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .feedback.correct {
+            color: #27ae60;
+        }
+
+        .feedback.incorrect {
+            color: #c0392b;
+        }
+
+        .correct-input {
+            border-color: var(--accent-color) !important;
+            background-color: #e8f8f5;
+        }
+
+        .incorrect-input {
+            border-color: var(--warning-color) !important;
+            background-color: #fadbd8;
+        }
+
+        #result-screen {
+            display: none;
+            background: #eef9f1;
+            border: 2px solid var(--accent-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        #score-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .draft-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
     </style>
 </head>
+<body>
 
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
-
-    <!-- Header & Navigation -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-black text-xl shadow-md">
-                    <i class="fa-solid fa-file-excel"></i>
-                </div>
-                <div>
-                    <h1 class="font-black text-slate-900 dark:text-white text-base leading-tight">Тренажер Секретаря Керівника</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Професія 4115 • Урок №2: Обробка таблиць в Excel</p>
-                </div>
-            </div>
-
-            <!-- Desktop Navigation Buttons -->
-            <nav class="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
-                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-slate-800 text-emerald-600 shadow-sm">
-                    <i class="fa-solid fa-chart-line"></i> Дашборд
-                </button>
-                <button onclick="switchTab('excel')" id="tab-btn-excel" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600">
-                    <i class="fa-solid fa-table text-emerald-600"></i> Емулятор Excel
-                </button>
-                <button onclick="switchTab('cases')" id="tab-btn-cases" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-amber-500">
-                    <i class="fa-solid fa-briefcase text-amber-500"></i> Кейси з конспекту
-                </button>
-                <button onclick="switchTab('safety')" id="tab-btn-safety" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-sky-500">
-                    <i class="fa-solid fa-shield-halved text-sky-500"></i> Охорона Праці
-                </button>
-            </nav>
-
-            <!-- Score Pill -->
-            <div class="flex items-center gap-3">
-                <div class="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 rounded-xl flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-amber-500 text-sm"></i>
-                    <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300" id="header-score">0 / 300 БАЛІВ</span>
-                </div>
-            </div>
-        </div>
+<div class="container">
+    <header>
+        <h1>Інтерактивний тренажер: Оволодіння мовними засобами у професійній діяльності секретаря керівника</h1>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="meta-info">
+        <strong>Інструкція:</strong> Виконайте всі завдання. Після завершення натисніть кнопку «Перевірити та сформувати результат» у нижній частині сторінки.
+    </div>
 
-        <!-- ==================== TAB 1: DASHBOARD ==================== -->
-        <section id="mod-dashboard" class="tab-content space-y-6">
-            <!-- Hero Card -->
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 p-8 text-white shadow-xl">
-                <div class="relative z-10 max-w-2xl space-y-3">
-                    <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md">Інтерактивне заняття з виробничого навчання</span>
-                    <h2 class="text-3xl font-black">Обробка табличної інформації в MS Excel</h2>
-                    <p class="text-slate-200 text-sm leading-relaxed">
-                        Вітаємо у навчальному тренажері! Тут ви навчитеся веденню реєстрів кореспонденції, використанню формул <code>=СУМ()</code> та <code>=ЕСЛИ()</code>, умовному форматуванню та дотриманню правил охорони праці на робочому місці.
-                    </p>
-                    <div class="pt-2 flex flex-wrap gap-3">
-                        <button onclick="switchTab('excel')" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-md transition-all flex items-center gap-2">
-                            <i class="fa-solid fa-play"></i> Розпочати практику в Excel
-                        </button>
-                    </div>
-                </div>
+    <form id="trainer-form">
+
+        <!-- Завдання 1 -->
+        <div class="task-card">
+            <div class="task-title">Завдання 1 (Початковий рівень). Лексичний самоаудит</div>
+            <div class="task-meta">Мета: Навчитися виявляти та усувати тавтологію, плеоназми й суржикові вислови.</div>
+            
+            <div class="item">
+                <label>1. Внутрішній інтер'єр кабінету керівника →</label>
+                <input type="text" data-ans="інтер'єр кабінету керівника|інтер'єр кабінету" placeholder="Введіть виправлений варіант">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>2. Приймати участь у нараді →</label>
+                <input type="text" data-ans="брати участь у нараді|брати участь в нараді" placeholder="Введіть виправлений варіант">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>3. Повістка дня засідання →</label>
+                <input type="text" data-ans="порядок денний засідання" placeholder="Введіть виправлений варіант">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>4. Перший дебют нової компанії →</label>
+                <input type="text" data-ans="дебют нової компанії|перший виступ нової компанії" placeholder="Введіть виправлений варіант">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>5. Підвести підсумки роботи за місяць →</label>
+                <input type="text" data-ans="підбити підсумки роботи за місяць|підсумувати роботу за місяць" placeholder="Введіть виправлений варіант">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>6. Вкажіть вашу адресу проживання →</label>
+                <input type="text" data-ans="вкажіть вашу адресу|зазначте вашу адресу" placeholder="Введіть виправлений варіант">
+                <div class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- Завдання 2 -->
+        <div class="task-card">
+            <div class="task-title">Завдання 2 (Базовий рівень). Етикет звернення: кличний відмінок</div>
+            <div class="task-meta">Мета: Відпрацювати навички утворення форм кличного відмінка.</div>
+
+            <div class="item">
+                <label>1. Пан директор (Петро Васильович) →</label>
+                <input type="text" data-ans="пане директоре (петре васильовичу)|пане директоре, петре васильовичу|пане директоре петре васильовичу" placeholder="Введіть у кличному відмінку">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>2. Секретар (Олена Іванівна) →</label>
+                <input type="text" data-ans="секретарю (олено іванівно)|секретарю, олено іванівно|секретарю олено іванівно" placeholder="Введіть у кличному відмінку">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>3. Колега (Ігор Олександрович) →</label>
+                <input type="text" data-ans="колего (ігоре олександровичу)|колего (ігорю олександровичу)|колего, ігоре олександровичу|колего ігоре олександровичу" placeholder="Введіть у кличному відмінку">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>4. Пані голова (Тетяна Миколаївна) →</label>
+                <input type="text" data-ans="пані голово (тетяно миколаївно)|пані голово, тетяно миколаївно|пані голово тетяно миколаївно" placeholder="Введіть у кличному відмінку">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>5. Пан професор (Олег Юрійович) →</label>
+                <input type="text" data-ans="пане професоре (олегу юрійовичу)|пане професоре (олеже юрійовичу)|пане професоре, олегу юрійовичу" placeholder="Введіть у кличному відмінку">
+                <div class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- Завдання 3 -->
+        <div class="task-card">
+            <div class="task-title">Завдання 3 (Середній рівень). Числова інформація в документах</div>
+            <div class="task-meta">Мета: Навчитися правильно відмінювати числівники прописом.</div>
+
+            <div class="item">
+                <label>1. Надати довідку про реєстрацію (540) _____ вхідних документів за поточний місяць.</label>
+                <input type="text" data-ans="п'ятисот сорока|п’ятисот сорока|п'ятиста сорока" placeholder="Запишіть числівник словами">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>2. Преміювання узгоджено з (50) _____ співробітниками підприємства.</label>
+                <input type="text" data-ans="п'ятдесятьма|п'ятдесятьома|п’ятдесятьма" placeholder="Запишіть числівник словами">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>3. Видати матеріальну допомогу (378) _____ працівникам комбінату.</label>
+                <input type="text" data-ans="трьомстам сьомидесяти восьми|трьомстам сімдесяти восьми|трьомстам сімдесятьом вісімкома" placeholder="Запишіть числівник словами">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>4. Додати до протоколу матеріали на (86) _____ сторінках.</label>
+                <input type="text" data-ans="вісімдесяти шести|вісімдесятьох шістьох" placeholder="Запишіть числівник словами">
+                <div class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- Завдання 4 -->
+        <div class="task-card">
+            <div class="task-title">Завдання 4 (Достатній рівень). Синтаксичний аналіз</div>
+            <div class="task-meta">Мета: Виправити синтаксичні помилки у прийменниках та дієприслівникових зворотах.</div>
+
+            <div class="item">
+                <label>1. Заходи по охороні праці були вжиті у відповідності з діючим законодавством. →</label>
+                <input type="text" data-ans="заходи щодо охорони праці були вжиті відповідно до чинного законодавства|заходи з охорони праці були вжиті відповідно до чинного законодавства" placeholder="Введіть відредаговане речення">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>2. Комісія по питанням перевірки працювала два дні. →</label>
+                <input type="text" data-ans="комісія з питань перевірки працювала два дні|комісія з питань перевірки працювала протягом двох днів" placeholder="Введіть відредаговане речення">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>3. Оформлюючи наказ про відрядження, секретарем було допущено помилку в даті. →</label>
+                <input type="text" data-ans="оформлюючи наказ про відрядження, секретар припустився помилки в даті|оформлюючи наказ про відрядження, секретар припустилася помилки в даті|під час оформлення наказу про відрядження секретар припустився помилки в даті" placeholder="Введіть відредаговане речення">
+                <div class="feedback"></div>
+            </div>
+            <div class="item">
+                <label>4. Працівника було звільнено по власному бажанню з технічних причин. →</label>
+                <input type="text" data-ans="працівника було звільнено за власним бажанням з технічних причин|працівника звільнили за власним бажанням з технічних причин" placeholder="Введіть відредаговане речення">
+                <div class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- Завдання 5 -->
+        <div class="task-card">
+            <div class="task-title">Завдання 5 (Високий рівень). Мовна експертиза та редагування службового документа</div>
+            <div class="task-meta">Мета: Комплексне редагування тексту службової записки.</div>
+
+            <div class="draft-box">
+                «Шановний Іван Петрович! Повідомляємо, що слідуюча нарада по питанням охорони праці відбудеться в слідуючий вівторок у дві години дня. Прошу Вас прийняти участь та підвести підсумки роботи трьохсот двадцяти п'яти робітників. Розглянувши Вашу заяву, нами було прийнято позитивне рішення.»
             </div>
 
-            <!-- Stats & Progress -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Rank Card -->
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3 shadow-sm">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold uppercase text-slate-400">Рівень кваліфікації</span>
-                        <i class="fa-solid fa-award text-2xl text-emerald-500"></i>
-                    </div>
-                    <div class="text-2xl font-black text-slate-800 dark:text-white" id="user-rank-title">Учень-Початківець</div>
-                    <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div id="rank-progress-bar" class="h-full bg-emerald-500 w-0 transition-all duration-500"></div>
-                    </div>
-                    <p class="text-xs text-slate-500" id="rank-next-desc">Виконайте завдання для підвищення рівня</p>
-                </div>
-
-                <!-- Score Overview -->
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3 shadow-sm">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold uppercase text-slate-400">Загальні бали</span>
-                        <i class="fa-solid fa-star text-2xl text-amber-500"></i>
-                    </div>
-                    <div class="text-3xl font-black text-slate-800 dark:text-white" id="dash-total-score">0 / 300</div>
-                    <p class="text-xs text-slate-500">Максимальний бал за 3 інтерактивні блоки</p>
-                </div>
-
-                <!-- Master Tip -->
-                <div class="bg-emerald-50 dark:bg-emerald-950/40 p-6 rounded-3xl border border-emerald-200 dark:border-emerald-800 space-y-2">
-                    <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                        <i class="fa-solid fa-user-graduate"></i> Порада Майстра ВН:
-                    </div>
-                    <p class="text-xs text-slate-600 dark:text-slate-300 italic leading-relaxed">
-                        "Пам'ятайте! Формули в Excel завжди починаються зі знака '='. А правильне форматування дати усуває помилки при сортуванні та контролі термінів виконання."
-                    </p>
-                </div>
+            <div class="item">
+                <label>Відредагований варіант тексту:</label>
+                <textarea id="task5-text" placeholder="Напишіть повністю відредагований текст службової записки..."></textarea>
+                <div class="feedback" id="task5-feedback"></div>
             </div>
+        </div>
 
-            <!-- Task Modules Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div onclick="switchTab('excel')" class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500 cursor-pointer transition-all space-y-3 shadow-sm">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center font-bold text-xl"><i class="fa-solid fa-file-excel"></i></div>
-                    <h3 class="font-bold text-base">1. Практичний Емулятор Excel</h3>
-                    <p class="text-xs text-slate-500">Складання реєстру, введення формул СУМ та ЕСЛИ, підсвічування термінів.</p>
-                    <div class="text-xs font-bold text-emerald-600" id="stat-excel-score">0 / 100 балів</div>
-                </div>
+        <!-- Завдання 6 -->
+        <div class="task-card">
+            <div class="task-title">Завдання 6 (Професійно-прикладний рівень). Складання службової записки</div>
+            <div class="task-meta">Мета: Самостійне складання службової записки за вимогами ДСТУ 4163:2020.</div>
 
-                <div onclick="switchTab('cases')" class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 hover:border-amber-500 cursor-pointer transition-all space-y-3 shadow-sm">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 flex items-center justify-center font-bold text-xl"><i class="fa-solid fa-briefcase"></i></div>
-                    <h3 class="font-bold text-base">2. Виробничі Кейси</h3>
-                    <p class="text-xs text-slate-500">Аналіз 4 робочих ситуацій секретаря з опису конспекту уроку.</p>
-                    <div class="text-xs font-bold text-amber-600" id="stat-cases-score">0 / 100 балів</div>
-                </div>
-
-                <div onclick="switchTab('safety')" class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 hover:border-sky-500 cursor-pointer transition-all space-y-3 shadow-sm">
-                    <div class="w-12 h-12 rounded-2xl bg-sky-100 dark:bg-sky-950 text-sky-600 flex items-center justify-center font-bold text-xl"><i class="fa-solid fa-shield-halved"></i></div>
-                    <h3 class="font-bold text-base">3. Охорона Праці та Організація</h3>
-                    <p class="text-xs text-slate-500">Норми безпечної роботи за комп'ютером, ергономіка робочого місця.</p>
-                    <div class="text-xs font-bold text-sky-600" id="stat-safety-score">0 / 100 балів</div>
-                </div>
+            <div class="item">
+                <label>Текст службової записки (5–8 речень, звернення в кличному відмінку, складений числівник прописом, ділові формули):</label>
+                <textarea id="task6-text" placeholder="Складіть текст службової записки про закупівлю канцелярії..."></textarea>
+                <div class="feedback" id="task6-feedback"></div>
             </div>
-        </section>
+        </div>
 
-        <!-- ==================== TAB 2: EXCEL EMULATOR ==================== -->
-        <section id="mod-excel" class="tab-content hidden space-y-6">
-            <div class="flex justify-between items-center flex-wrap gap-2">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-solid fa-file-excel text-emerald-600"></i> Емулятор Табличного Процесора MS Excel
-                    </h2>
-                    <p class="text-xs text-slate-500">Завдання секретаря: Заповніть формули у Реєстрі вхідної кореспонденції та перевірте підсумки.</p>
-                </div>
-                <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-bold">100 БАЛІВ</span>
-            </div>
+        <button type="button" class="btn" onclick="checkAnswers()">Перевірити та сформувати результат</button>
 
-            <!-- Task Instructions -->
-            <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs space-y-1">
-                <span class="font-bold text-emerald-900 dark:text-emerald-300"><i class="fa-solid fa-list-check mr-1"></i> Завдання для виконання:</span>
-                <ol class="list-decimal pl-5 text-slate-700 dark:text-slate-300 space-y-1">
-                    <li>У клітинку <strong>E6</strong> введіть формулу підсумовування кількості документів: <code>=СУМ(E2:E5)</code> або <code>=SUM(E2:E5)</code>.</li>
-                    <li>У клітинку <strong>F2</strong> введіть формулу перевірки статусу: <code>=ЕСЛИ(D2>0;"Вчасно";"Прострочено")</code>.</li>
-                    <li>Натисніть кнопку <strong>«Умовне форматування»</strong>, щоб виділити прострочені терміни.</li>
-                    <li>Натисніть <strong>«Перевірити розрахунки»</strong> для отримання оцінки.</li>
-                </ol>
-            </div>
+    </form>
 
-            <!-- Interactive Excel Window -->
-            <div class="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-lg">
-                <!-- Ribbon Header -->
-                <div class="bg-emerald-700 text-white px-5 py-2.5 flex items-center justify-between text-xs font-bold">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-table"></i>
-                        <span>Реєстр_Вхідної_Кореспонденції_2026.xlsx</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="toggleExcelFilter()" id="btn-excel-filter" class="bg-emerald-800 hover:bg-emerald-900 px-3 py-1 rounded-lg text-xs transition-all">
-                            <i class="fa-solid fa-filter mr-1"></i> Фільтр: <span id="filter-label">Усі</span>
-                        </button>
-                        <button onclick="applyConditionalFormatting()" id="btn-excel-cond" class="bg-emerald-800 hover:bg-emerald-900 px-3 py-1 rounded-lg text-xs transition-all">
-                            <i class="fa-solid fa-highlighter mr-1"></i> Умовне форматування
-                        </button>
-                    </div>
-                </div>
+    <div id="result-screen">
+        <h2>Результати виконання практичної роботи</h2>
+        <div id="score-display">0 / 100 балів</div>
+        <p id="level-display"></p>
+        <p>Ваші відповіді збережено для викладача.</p>
+    </div>
+</div>
 
-                <!-- Table Container -->
-                <div class="overflow-x-auto p-4">
-                    <table class="w-full text-xs text-left border-collapse" id="excel-table">
-                        <thead>
-                            <tr class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-300 dark:border-slate-600">
-                                <th class="p-2.5 border text-center w-10">№</th>
-                                <th class="p-2.5 border">A (Кореспондент)</th>
-                                <th class="p-2.5 border">B (Вид документа)</th>
-                                <th class="p-2.5 border">C (Дата)</th>
-                                <th class="p-2.5 border text-center">D (Днів до терміну)</th>
-                                <th class="p-2.5 border text-center">E (Кількість)</th>
-                                <th class="p-2.5 border text-center">F (Статус виконання)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-200 dark:divide-slate-700 font-mono">
-                            <!-- Row 2 -->
-                            <tr class="excel-row hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <td class="p-2 border text-center font-bold bg-slate-50 dark:bg-slate-700">2</td>
-                                <td class="p-2 border font-sans">Департамент освіти</td>
-                                <td class="p-2 border font-sans">Запит про звітність</td>
-                                <td class="p-2 border">24.09.2026</td>
-                                <td class="p-2 border text-center font-bold text-emerald-600">5</td>
-                                <td class="p-2 border text-center">3</td>
-                                <td class="p-2 border text-center">
-                                    <input id="cell-F2" type="text" placeholder="=ЕСЛИ(...)" class="w-full bg-slate-50 dark:bg-slate-900 border p-1 rounded text-center text-xs font-mono">
-                                </td>
-                            </tr>
-                            <!-- Row 3 -->
-                            <tr class="excel-row hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <td class="p-2 border text-center font-bold bg-slate-50 dark:bg-slate-700">3</td>
-                                <td class="p-2 border font-sans">ТОВ «Техно-Сервіс»</td>
-                                <td class="p-2 border font-sans">Акт виконаних робіт</td>
-                                <td class="p-2 border">20.09.2026</td>
-                                <td class="p-2 border text-center font-bold text-rose-600 cell-overdue-days">-2</td>
-                                <td class="p-2 border text-center">1</td>
-                                <td class="p-2 border text-center text-rose-600 font-bold font-sans">Прострочено</td>
-                            </tr>
-                            <!-- Row 4 -->
-                            <tr class="excel-row hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <td class="p-2 border text-center font-bold bg-slate-50 dark:bg-slate-700">4</td>
-                                <td class="p-2 border font-sans">ПАТ «КиївЕнерго»</td>
-                                <td class="p-2 border font-sans">Договір постачання</td>
-                                <td class="p-2 border">22.09.2026</td>
-                                <td class="p-2 border text-center font-bold text-emerald-600">2</td>
-                                <td class="p-2 border text-center">4</td>
-                                <td class="p-2 border text-center text-emerald-600 font-bold font-sans">Вчасно</td>
-                            </tr>
-                            <!-- Row 5 -->
-                            <tr class="excel-row hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <td class="p-2 border text-center font-bold bg-slate-50 dark:bg-slate-700">5</td>
-                                <td class="p-2 border font-sans">Міський Архів</td>
-                                <td class="p-2 border font-sans">Лист-довідка</td>
-                                <td class="p-2 border">25.09.2026</td>
-                                <td class="p-2 border text-center font-bold text-emerald-600">8</td>
-                                <td class="p-2 border text-center">2</td>
-                                <td class="p-2 border text-center text-emerald-600 font-bold font-sans">Вчасно</td>
-                            </tr>
-                            <!-- Summary Row 6 -->
-                            <tr class="bg-amber-50 dark:bg-amber-950/40 font-bold border-t-2 border-slate-400">
-                                <td class="p-2 border text-center bg-slate-100 dark:bg-slate-700">6</td>
-                                <td colspan="3" class="p-2 border font-sans text-right">Всього документів (СУМА):</td>
-                                <td class="p-2 border text-center text-slate-400">—</td>
-                                <td class="p-2 border text-center">
-                                    <input id="cell-E6" type="text" placeholder="=СУМ(E2:E5)" class="w-full bg-white dark:bg-slate-900 border-2 border-emerald-500 p-1 rounded text-center text-xs font-mono font-bold text-emerald-600">
-                                </td>
-                                <td class="p-2 border text-center text-slate-400">—</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+<script>
+    function cleanText(str) {
+        return str.toLowerCase()
+                  .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+                  .replace(/\s{2,}/g, " ")
+                  .trim();
+    }
 
-                <!-- Footer & Buttons -->
-                <div class="p-4 bg-slate-50 dark:bg-slate-700/50 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center flex-wrap gap-3">
-                    <button onclick="autofillExcel()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-600 text-xs font-semibold hover:bg-slate-300">
-                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Підказка майстра
-                    </button>
-                    <button onclick="checkExcelTask()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition-all">
-                        <i class="fa-solid fa-circle-check mr-1"></i> Перевірити Розрахунки
-                    </button>
-                </div>
-            </div>
+    function checkAnswers() {
+        let totalScore = 0;
+        let maxScore = 100;
+        
+        // Автоматична перевірка Завдань 1-4 (60 балів загалом, по 3 бали за пункт)
+        const inputs = document.querySelectorAll('input[data-ans]');
+        
+        inputs.forEach(input => {
+            const userAns = cleanText(input.value);
+            const validAnswers = input.getAttribute('data-ans').split('|').map(a => cleanText(a));
+            const feedbackEl = input.nextElementSibling;
 
-            <!-- Feedback Box -->
-            <div id="excel-feedback" class="hidden p-5 rounded-2xl border space-y-2"></div>
-        </section>
-
-        <!-- ==================== TAB 3: CASES ==================== -->
-        <section id="mod-cases" class="tab-content hidden space-y-6">
-            <div class="flex justify-between items-center flex-wrap gap-2">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-solid fa-briefcase text-amber-500"></i> Аналіз Виробничих Ситуацій
-                    </h2>
-                    <p class="text-xs text-slate-500">Дайте відповіді на практичні проблеми згідно з конспектом уроку.</p>
-                </div>
-                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-xs font-bold">100 БАЛІВ</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Case 1 -->
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3 shadow-sm">
-                    <div class="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase">
-                        <i class="fa-solid fa-filter"></i> Ситуація 1. Реєстр кореспонденції
-                    </div>
-                    <h3 class="font-bold text-sm">Як швидко відобразити керівникові лише листи від державних органів влади за останній місяць?</h3>
-                    <div class="space-y-2 text-xs">
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case1" value="a"> <span>Видалити інші рядки вручну.</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case1" value="b"> <span>Застосувати Автофільтр у стовпці «Кореспондент» та сортування за датою.</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case1" value="c"> <span>Скопіювати кожен лист окремо у Word.</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Case 2 -->
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3 shadow-sm">
-                    <div class="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase">
-                        <i class="fa-solid fa-clock"></i> Ситуація 2. Прострочені доручення
-                    </div>
-                    <h3 class="font-bold text-sm">Який інструмент Excel дозволяє автоматично виділяти червоним кольором прострочені терміни?</h3>
-                    <div class="space-y-2 text-xs">
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case2" value="a"> <span>Умовне форматування (Conditional Formatting).</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case2" value="b"> <span>Ручне зафарбовування заливкою.</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case2" value="c"> <span>Функція СРЗНАЧ.</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Case 3 -->
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3 shadow-sm">
-                    <div class="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase">
-                        <i class="fa-solid fa-table-cells"></i> Ситуація 3. Графік нарад
-                    </div>
-                    <h3 class="font-bold text-sm">Щоб заголовок великої таблиці не зникав при прокручуванні вниз, виконують:</h3>
-                    <div class="space-y-2 text-xs">
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case3" value="a"> <span>Закріплення областей (Freeze Panes).</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case3" value="b"> <span>Зменшення шрифту до мінімуму.</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case3" value="c"> <span>Захист аркуша паролем.</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Case 4 -->
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-3 shadow-sm">
-                    <div class="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase">
-                        <i class="fa-solid fa-spell-check"></i> Ситуація 4. Помилки введення
-                    </div>
-                    <h3 class="font-bold text-sm">Новий секретар вводив назви фірм з помилками ("ТОВ Схід", "тов Схід"). Як запобігти цьому надалі?</h3>
-                    <div class="space-y-2 text-xs">
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case4" value="a"> <span>Створити список, що розкривається (Перевірка даних / Data Validation).</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case4" value="b"> <span>Заборонити вводити літери.</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <input type="radio" name="case4" value="c"> <span>Використовувати лише цифрові коди.</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex justify-end pt-2">
-                <button onclick="checkCases()" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md transition-all">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Відправити відповіді кейсів
-                </button>
-            </div>
-
-            <div id="cases-feedback" class="hidden p-5 rounded-2xl border space-y-2"></div>
-        </section>
-
-        <!-- ==================== TAB 4: SAFETY ==================== -->
-        <section id="mod-safety" class="tab-content hidden space-y-6">
-            <div class="flex justify-between items-center flex-wrap gap-2">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-solid fa-shield-halved text-sky-500"></i> Інструктаж з Охорони Праці та Комп'ютерної Грамотності
-                    </h2>
-                    <p class="text-xs text-slate-500">Правила безпечної роботи секретаря за ПК та теорія Excel.</p>
-                </div>
-                <span class="px-3 py-1 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 text-xs font-bold">100 БАЛІВ</span>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-6 shadow-sm">
-                <!-- Q1 -->
-                <div class="space-y-2">
-                    <h3 class="font-bold text-sm">1. Яка оптимальна відстань від очей секретаря до екрана монітора під час роботи?</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety1" value="a"> <span>20–30 см</span>
-                        </label>
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety1" value="b"> <span>60–70 см (довжина витягнутої руки)</span>
-                        </label>
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety1" value="c"> <span>Більше 1.5 метра</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Q2 -->
-                <div class="space-y-2">
-                    <h3 class="font-bold text-sm">2. З якого знака ЗАВЖДИ починається формула в MS Excel?</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety2" value="a"> <span>Зі знака "+"</span>
-                        </label>
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety2" value="b"> <span>Зі знака "="</span>
-                        </label>
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety2" value="c"> <span>Зі знака "f(x)"</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Q3 -->
-                <div class="space-y-2">
-                    <h3 class="font-bold text-sm">3. Як правильно називається місце перетину рядка та стовпця в Excel?</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety3" value="a"> <span>Клітинка (комірка)</span>
-                        </label>
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety3" value="b"> <span>Рядок формул</span>
-                        </label>
-                        <label class="p-3 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
-                            <input type="radio" name="q_safety3" value="c"> <span>Стрічка інструментів</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="flex justify-end pt-2">
-                    <button onclick="checkSafetyTest()" class="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow-md transition-all">
-                        <i class="fa-solid fa-check-double mr-1"></i> Перевірити знання ОП
-                    </button>
-                </div>
-            </div>
-
-            <div id="safety-feedback" class="hidden p-5 rounded-2xl border space-y-2"></div>
-        </section>
-
-    </main>
-
-    <!-- SCRIPT LOGIC -->
-    <script>
-        // State
-        let scores = {
-            excel: 0,
-            cases: 0,
-            safety: 0
-        };
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`mod-${tabId}`).classList.remove('hidden');
-
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = "tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600";
-            });
-
-            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-            if (activeBtn) {
-                activeBtn.className = "tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-slate-800 text-emerald-600 shadow-sm";
-            }
-        }
-
-        // Excel Module
-        let isCondActive = false;
-        let isFilterActive = false;
-
-        function applyConditionalFormatting() {
-            isCondActive = !isCondActive;
-            const overdueCell = document.querySelector('.cell-overdue-days');
-            if (isCondActive) {
-                overdueCell.parentElement.classList.add('bg-rose-100', 'dark:bg-rose-950/80');
-                document.getElementById('btn-excel-cond').className = "bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-xs transition-all font-bold";
+            if (userAns !== "" && validAnswers.some(ans => userAns.includes(ans) || ans.includes(userAns))) {
+                input.classList.add('correct-input');
+                input.classList.remove('incorrect-input');
+                feedbackEl.textContent = "✓ Правильно";
+                feedbackEl.className = "feedback correct";
+                feedbackEl.style.display = "block";
+                totalScore += 3;
             } else {
-                overdueCell.parentElement.classList.remove('bg-rose-100', 'dark:bg-rose-950/80');
-                document.getElementById('btn-excel-cond').className = "bg-emerald-800 hover:bg-emerald-900 text-white px-3 py-1 rounded-lg text-xs transition-all";
+                input.classList.add('incorrect-input');
+                input.classList.remove('correct-input');
+                feedbackEl.textContent = `✗ Помилка або неточність. Очікувано: ${input.getAttribute('data-ans').split('|')[0]}`;
+                feedbackEl.className = "feedback incorrect";
+                feedbackEl.style.display = "block";
             }
-        }
+        });
 
-        function toggleExcelFilter() {
-            isFilterActive = !isFilterActive;
-            const rows = document.querySelectorAll('.excel-row');
-            if (isFilterActive) {
-                rows[1].classList.add('hidden'); // hide overdue
-                document.getElementById('filter-label').textContent = "Тільки Вчасно";
-            } else {
-                rows.forEach(r => r.classList.remove('hidden'));
-                document.getElementById('filter-label').textContent = "Усі";
-            }
-        }
+        // Перевірка Завдання 5 (20 балів)
+        const t5 = document.getElementById('task5-text').value.toLowerCase();
+        const t5Feedback = document.getElementById('task5-feedback');
+        let t5Score = 0;
 
-        function autofillExcel() {
-            document.getElementById('cell-E6').value = "=СУМ(E2:E5)";
-            document.getElementById('cell-F2').value = '=ЕСЛИ(D2>0;"Вчасно";"Прострочено")';
-        }
+        // Перевірка ключових виправлень у завданні 5
+        if (t5.includes("іване петровичу")) t5Score += 4;
+        if (t5.includes("наступна") або t5.includes("чергова")) t5Score += 4;
+        if (t5.includes("з питань")) t5Score += 4;
+        if (t5.includes("о 14:00") або t5.includes("о другій годині")) t5Score += 4;
+        if (t5.includes("брати участь") та t5.includes("підбити підсумки")) t5Score += 4;
 
-        function checkExcelTask() {
-            const sumVal = document.getElementById('cell-E6').value.trim().toUpperCase();
-            const ifVal = document.getElementById('cell-F2').value.trim().toUpperCase();
+        totalScore += t5Score;
+        t5Feedback.style.display = "block";
+        t5Feedback.className = "feedback " + (t5Score >= 12 ? "correct" : "incorrect");
+        t5Feedback.textContent = `Оцінка за експертизу: ${t5Score} з 20 балів.`;
 
-            let score = 0;
-            let feedback = [];
+        // Перевірка Завдання 6 (20 балів)
+        const t6 = document.getElementById('task6-text').value;
+        const t6Feedback = document.getElementById('task6-feedback');
+        let t6Score = 0;
 
-            if (sumVal.includes("СУМ") || sumVal.includes("SUM") || sumVal === "10") {
-                score += 50;
-            } else {
-                feedback.push("Помилка в E6. Використайте формулу =СУМ(E2:E5)");
-            }
+        if (t6.length > 50) t6Score += 5; // Наявність достатнього тексту
+        if (t6.includes("пане") || t6.includes("пані") || t6.includes("вичу") || t6.includes("івно")) t6Score += 5; // Кличний відмінок
+        if (t6.includes("з метою") || t6.includes("відповідно до") || t6.includes("прошу")) t6Score += 5; // Кліше
+        if (/\d+/.test(t6) === false && t6.length > 30) t6Score += 5; // Перевірка використання числівників словами
 
-            if (ifVal.includes("ЕСЛИ") || ifVal.includes("IF") || ifVal.includes("ВЧАСНО")) {
-                score += 50;
-            } else {
-                feedback.push("Помилка в F2. Використайте формулу =ЕСЛИ(D2>0;\"Вчасно\";\"Прострочено\")");
-            }
+        totalScore += t6Score;
+        t6Feedback.style.display = "block";
+        t6Feedback.className = "feedback " + (t6Score >= 10 ? "correct" : "incorrect");
+        t6Feedback.textContent = `Оцінка за творче завдання: ${t6Score} з 20 балів (попередня автоперевірка).`;
 
-            scores.excel = score;
-            const fbBox = document.getElementById('excel-feedback');
-            fbBox.classList.remove('hidden');
+        // Виведення результатів
+        const resScreen = document.getElementById('result-screen');
+        const scoreDisp = document.getElementById('score-display');
+        const levelDisp = document.getElementById('level-display');
 
-            if (score === 100) {
-                fbBox.className = "p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs font-bold";
-                fbBox.innerHTML = "✓ Відмінно! Всі формули та розрахунки виконано правильно (+100 балів).";
-            } else {
-                fbBox.className = "p-5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200 text-xs";
-                fbBox.innerHTML = `Нараховано ${score} / 100 балів.<br>` + feedback.join('<br>');
-            }
+        scoreDisp.textContent = `${totalScore} / ${maxScore} балів`;
 
-            updateDashboard();
-        }
+        let level = "";
+        if (totalScore >= 90) level = "Високий рівень знань та професійної грамотності!";
+        else if (totalScore >= 74) level = "Достатній рівень знань. Є незначні зауваження.";
+        else if (totalScore >= 60) level = "Середній рівень. Потребує додаткового опрацювання норм.";
+        else level = "Початковий рівень. Рекомендується повторити матеріал.";
 
-        // Cases Module
-        function checkCases() {
-            const c1 = document.querySelector('input[name="case1"]:checked');
-            const c2 = document.querySelector('input[name="case2"]:checked');
-            const c3 = document.querySelector('input[name="case3"]:checked');
-            const c4 = document.querySelector('input[name="case4"]:checked');
+        levelDisp.textContent = `Ваш рівень: ${level}`;
+        resScreen.style.display = "block";
+        resScreen.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
 
-            let score = 0;
-            if (c1 && c1.value === 'b') score += 25;
-            if (c2 && c2.value === 'a') score += 25;
-            if (c3 && c3.value === 'a') score += 25;
-            if (c4 && c4.value === 'a') score += 25;
-
-            scores.cases = score;
-            const fbBox = document.getElementById('cases-feedback');
-            fbBox.classList.remove('hidden');
-            fbBox.className = "p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs font-bold";
-            fbBox.innerHTML = `Результат розв'язання виробничих кейсів: ${score} / 100 балів.`;
-
-            updateDashboard();
-        }
-
-        // Safety Module
-        function checkSafetyTest() {
-            const s1 = document.querySelector('input[name="q_safety1"]:checked');
-            const s2 = document.querySelector('input[name="q_safety2"]:checked');
-            const s3 = document.querySelector('input[name="q_safety3"]:checked');
-
-            let score = 0;
-            if (s1 && s1.value === 'b') score += 34;
-            if (s2 && s2.value === 'b') score += 33;
-            if (s3 && s3.value === 'a') score += 33;
-
-            scores.safety = score;
-            const fbBox = document.getElementById('safety-feedback');
-            fbBox.classList.remove('hidden');
-            fbBox.className = "p-5 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-800 text-sky-900 dark:text-sky-200 text-xs font-bold";
-            fbBox.innerHTML = `Результат перевірки знань з охорони праці: ${score} / 100 балів.`;
-
-            updateDashboard();
-        }
-
-        function updateDashboard() {
-            const total = scores.excel + scores.cases + scores.safety;
-            document.getElementById('header-score').textContent = `${total} / 300 БАЛІВ`;
-            document.getElementById('dash-total-score').textContent = `${total} / 300`;
-
-            document.getElementById('stat-excel-score').textContent = `${scores.excel} / 100 балів`;
-            document.getElementById('stat-cases-score').textContent = `${scores.cases} / 100 балів`;
-            document.getElementById('stat-safety-score').textContent = `${scores.safety} / 100 балів`;
-
-            let rank = "Учень-Початківець";
-            if (total >= 250) rank = "Майстер Діловодства 🏆";
-            else if (total >= 150) rank = "Кваліфікований Секретар ⭐";
-            else if (total >= 50) rank = "Помічник Секретаря 💼";
-
-            document.getElementById('user-rank-title').textContent = rank;
-            document.getElementById('rank-progress-bar').style.width = `${(total / 300) * 100}%`;
-        }
-    </script>
 </body>
 </html>
